@@ -25,6 +25,8 @@ public class MainActivityView extends SurfaceView implements SurfaceHolder.Callb
     private Bitmap brickYellow;
     private Bitmap brickGreen;
     private Bitmap brickBlue;
+    private Bitmap background;
+
 
     // Declaration des objets Ressources et Context permettant d'accéder aux ressources de notre application et de les charger
     private Resources   pRes;
@@ -40,6 +42,7 @@ public class MainActivityView extends SurfaceView implements SurfaceHolder.Callb
     static final int    carteTitleSize = 20;
     static final int    carteHeight = 6;
     static final int    carteWidth = 5;
+    static final int    sizeCST = 5;
     static final int    hitsNember=2;
     static final int    Timer=0;
 
@@ -91,6 +94,9 @@ public class MainActivityView extends SurfaceView implements SurfaceHolder.Callb
         brickYellow 	= BitmapFactory.decodeResource(pRes, R.drawable.brickyellow);
         brickBlue 		= BitmapFactory.decodeResource(pRes, R.drawable.brickblue);
         brickGreen 		= BitmapFactory.decodeResource(pRes, R.drawable.brickgreen);
+        vide 		    = BitmapFactory.decodeResource(pRes, R.drawable.empty);
+        background 		= BitmapFactory.decodeResource(pRes, R.drawable.background);
+
 
         cv_thread   = new Thread(this);
 
@@ -132,16 +138,7 @@ public class MainActivityView extends SurfaceView implements SurfaceHolder.Callb
 
     // initialisation du jeu
     public void initparameters(int l) {
-        paint = new Paint();
-        paint.setColor(0xff0000);
-
-        paint.setDither(true);
-        paint.setColor(0xFFFFFF00);
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeJoin(Paint.Join.ROUND);
-        paint.setStrokeCap(Paint.Cap.ROUND);
-        paint.setStrokeWidth(3);
-        paint.setTextAlign(Paint.Align.LEFT);
+        Log.e("-FCT-", " initparameters()");
         carte           = new int[carteHeight][carteWidth];
         carteTopAnchor  = (getHeight()- carteHeight*carteTitleSize)/2;
         carteLeftAnchor = (getWidth()- carteWidth*carteTitleSize)/2;
@@ -159,7 +156,7 @@ public class MainActivityView extends SurfaceView implements SurfaceHolder.Callb
             for (int j=0; j< carteWidth; j++) {
                 switch (carte[i][j]) {
                     case CST_brique1:
-                        canvas.drawBitmap(brickYellow, carteLeftAnchor+ j*carteTitleSize, carteTopAnchor+ i*carteTitleSize, null);
+                        canvas.drawBitmap(brickYellow, j * sizeCST, carteTopAnchor+ i*sizeCST, null);
                         break;
                     case CST_brique2:
                         canvas.drawBitmap(brickGreen,carteLeftAnchor+ j*carteTitleSize, carteTopAnchor+ i*carteTitleSize, null);
@@ -175,6 +172,11 @@ public class MainActivityView extends SurfaceView implements SurfaceHolder.Callb
         }
     }
 
+    //dessin du fond
+    private void paintFond(Canvas canvas) {
+        canvas.drawBitmap(background, 1, 1, null);
+    }
+
     // permet d'identifier si la partie est gagnee (tous les diamants à leur place)
     private boolean isWon() {
         for (int i=0; i< 4; i++) {
@@ -186,6 +188,8 @@ public class MainActivityView extends SurfaceView implements SurfaceHolder.Callb
     // dessin du jeu (fond uni, en fonction du jeu gagne ou pas dessin du plateau et du joueur des diamants et des fleches)
     private void nDraw(Canvas canvas) {
         canvas.drawRGB(44,44,44);
+        paintFond(canvas);
+
         if (isWon()) {
             initparameters(2);
         } else {
@@ -220,7 +224,7 @@ public class MainActivityView extends SurfaceView implements SurfaceHolder.Callb
         while (in) {
             try{
                 try {
-                    cv_thread.sleep(40);
+                    cv_thread.sleep(400);
                     c = holder.lockCanvas(null);
                     nDraw(c);
                 } finally {
