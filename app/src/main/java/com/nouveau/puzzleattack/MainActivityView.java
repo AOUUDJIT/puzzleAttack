@@ -18,8 +18,7 @@ import android.view.SurfaceView;
  */
 
 public class MainActivityView extends SurfaceView implements SurfaceHolder.Callback, Runnable{
-    // déclaration de la matrice
-    int [][] carte;
+
     //déclaration des images utilisées
     private Bitmap vide;
     private Bitmap brickYellow;
@@ -32,6 +31,9 @@ public class MainActivityView extends SurfaceView implements SurfaceHolder.Callb
     private Resources   pRes;
     private Context 	pContext;
 
+    // déclaration de la matrice
+    int [][] carte;
+
 
     // ancres pour pouvoir centrer la carte du jeu
     int        carteTopAnchor;                   // coordonnées en Y du point d'ancrage de notre carte
@@ -41,13 +43,10 @@ public class MainActivityView extends SurfaceView implements SurfaceHolder.Callb
 
     static final int    carteTitleSize = 20;
     static final int    carteHeight = 6;
-    static final int    carteWidth = 5;
+    static final int    carteWidth = 6;
     static final int    sizeCST = 5;
     static final int    hitsNember=2;
     static final int    Timer=0;
-
-
-    private     boolean in      = true;
 
 
     // constante modelisant les differentes types de cases
@@ -61,9 +60,11 @@ public class MainActivityView extends SurfaceView implements SurfaceHolder.Callb
                       {CST_vide,CST_vide,CST_vide,CST_vide,CST_vide,CST_vide},
                       {CST_vide,CST_vide,CST_vide,CST_vide,CST_vide,CST_vide},
                       {CST_vide,CST_vide,CST_vide,CST_vide,CST_vide,CST_vide},
-                      {CST_brique1,CST_brique1,CST_vide,CST_brique1,CST_vide,CST_vide},
+                      {CST_vide,CST_vide,CST_vide,CST_vide,CST_vide,CST_vide},
+                      {CST_brique1,CST_brique1,CST_vide,CST_vide,CST_vide,CST_vide},
     } ;
     int [][] puzzle2={{CST_vide,CST_vide,CST_vide,CST_vide,CST_vide,CST_vide},
+                      {CST_vide,CST_vide,CST_vide,CST_vide,CST_vide,CST_vide},
                       {CST_vide,CST_vide,CST_vide,CST_vide,CST_vide,CST_vide},
                       {CST_vide,CST_vide,CST_vide,CST_brique2,CST_vide,CST_vide},
                       {CST_vide,CST_vide,CST_vide,CST_brique2,CST_vide,CST_vide},
@@ -71,14 +72,17 @@ public class MainActivityView extends SurfaceView implements SurfaceHolder.Callb
     } ;
 
     int [][] puzzle3={{CST_vide,CST_vide,CST_vide,CST_vide,CST_vide,CST_vide},
+                      {CST_vide,CST_vide,CST_vide,CST_vide,CST_vide,CST_vide},
                       {CST_vide,CST_vide,CST_vide,CST_vide,CST_brique2,CST_vide},
                       {CST_vide,CST_vide,CST_vide,CST_vide,CST_brique3,CST_vide},
                       {CST_vide,CST_vide,CST_brique2,CST_brique2,CST_brique3,CST_vide},
                       {CST_vide,CST_brique1,CST_brique1,CST_brique3,CST_brique1,CST_vide},
     } ;
 
+
     SurfaceHolder holder;
     private     Thread  cv_thread;
+    private     boolean in      = true;
     Paint paint;
 
     public MainActivityView(Context context, AttributeSet attrs) {
@@ -91,42 +95,42 @@ public class MainActivityView extends SurfaceView implements SurfaceHolder.Callb
         // chargement des images
         pContext	    = context;
         pRes 		    = pContext.getResources();
-        brickYellow 	= BitmapFactory.decodeResource(pRes, R.drawable.brickyellow);
-        brickBlue 		= BitmapFactory.decodeResource(pRes, R.drawable.brickblue);
-        brickGreen 		= BitmapFactory.decodeResource(pRes, R.drawable.brickgreen);
+        brickYellow 	= BitmapFactory.decodeResource(pRes, R.drawable.yellow);
+        brickBlue 		= BitmapFactory.decodeResource(pRes, R.drawable.blue);
+        brickGreen 		= BitmapFactory.decodeResource(pRes, R.drawable.sky);
         vide 		    = BitmapFactory.decodeResource(pRes, R.drawable.empty);
         background 		= BitmapFactory.decodeResource(pRes, R.drawable.background);
 
 
-        cv_thread   = new Thread(this);
 
         initparameters(1);
 
-
+        cv_thread   = new Thread(this);
 
         // prise de focus pour gestion des touches
         setFocusable(true);
     }
 
+    // chargement du niveau a partir du tableau de reference du niveau
     private void loadlevel(int l) {
         if (l == 1) {
-            for (int i = 0; i < 5; i++) {
-                for (int j = 0; j < 6; j++) {
+            for (int i = 0; i < carteWidth; i++) {
+                for (int j = 0; j < carteHeight; j++) {
                     carte[j][i] = puzzle1[j][i];
                 }
             }
         }
         else if (l==2) {
-            for (int i = 0; i < 5; i++) {
-                for (int j = 0; j < 6; j++) {
+            for (int i = 0; i < carteWidth; i++) {
+                for (int j = 0; j < carteHeight; j++) {
                     carte[j][i] = puzzle2[j][i];
                 }
             }
 
         }
         else if (l==3) {
-            for (int i = 0; i < 5; i++) {
-                for (int j = 0; j < 6; j++) {
+            for (int i = 0; i < carteWidth; i++) {
+                for (int j = 0; j < carteHeight; j++) {
                     carte[j][i] = puzzle3[j][i];
                 }
             }
@@ -138,10 +142,12 @@ public class MainActivityView extends SurfaceView implements SurfaceHolder.Callb
 
     // initialisation du jeu
     public void initparameters(int l) {
+
         Log.e("-FCT-", " initparameters()");
         carte           = new int[carteHeight][carteWidth];
-        carteTopAnchor  = (getHeight()- carteHeight*carteTitleSize)/2;
-        carteLeftAnchor = (getWidth()- carteWidth*carteTitleSize)/2;
+        loadlevel(l);
+        carteTopAnchor = getHeight()-371;
+        carteLeftAnchor = (getWidth()) / carteWidth;
 
         if ((cv_thread!=null) && (!cv_thread.isAlive())) {
             cv_thread.start();
@@ -152,20 +158,21 @@ public class MainActivityView extends SurfaceView implements SurfaceHolder.Callb
 
     // dessin de la carte du jeu
     private void paintcarte(Canvas canvas) {
+        Log.e("-FCT-", "paintcarte()");
         for (int i=0; i< carteHeight; i++) {
             for (int j=0; j< carteWidth; j++) {
                 switch (carte[i][j]) {
                     case CST_brique1:
-                        canvas.drawBitmap(brickYellow, j * sizeCST, carteTopAnchor+ i*sizeCST, null);
+                        canvas.drawBitmap(brickYellow, j*sizeCST, carteTopAnchor+ i, null);
                         break;
                     case CST_brique2:
-                        canvas.drawBitmap(brickGreen,carteLeftAnchor+ j*carteTitleSize, carteTopAnchor+ i*carteTitleSize, null);
+                        canvas.drawBitmap(brickGreen, j*sizeCST, carteTopAnchor+ i*sizeCST, null);
                         break;
                     case CST_brique3:
-                        canvas.drawBitmap(brickBlue,carteLeftAnchor+ j*carteTitleSize, carteTopAnchor+ i*carteTitleSize, null);
+                        canvas.drawBitmap(brickBlue,j*sizeCST, carteTopAnchor+ i*sizeCST, null);
                         break;
                     case CST_vide:
-                        canvas.drawBitmap(vide,carteLeftAnchor+ j*carteTitleSize, carteTopAnchor+ i*carteTitleSize, null);
+                        canvas.drawBitmap(vide,j*sizeCST, carteTopAnchor+ i*sizeCST, null);
                         break;
                 }
             }
@@ -191,6 +198,7 @@ public class MainActivityView extends SurfaceView implements SurfaceHolder.Callb
         paintFond(canvas);
 
         if (isWon()) {
+            paintcarte(canvas);
             initparameters(2);
         } else {
             paintcarte(canvas);
@@ -199,8 +207,7 @@ public class MainActivityView extends SurfaceView implements SurfaceHolder.Callb
     }
 
 
-
-
+    // callback sur le cycle de vie de la surfaceview
     @Override
     public void surfaceChanged(SurfaceHolder surfaceHolder, int format, int width, int height) {
         Log.i("-> FCT <-", "surfaceChanged "+ width +" - "+ height);
@@ -224,7 +231,7 @@ public class MainActivityView extends SurfaceView implements SurfaceHolder.Callb
         while (in) {
             try{
                 try {
-                    cv_thread.sleep(400);
+                    cv_thread.sleep(40);
                     c = holder.lockCanvas(null);
                     nDraw(c);
                 } finally {
